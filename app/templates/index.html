@@ -1,0 +1,214 @@
+<html>
+    <head>
+        <title>Nagios dashboard</title>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='nagios.css') }}">
+	<meta http-equiv="refresh" content="30">
+	<script language="JavaScript" type="text/javascript">
+	var seconds =30;
+	var url="{{nagiosdashboard}}";
+
+	function countdown(){
+		if (seconds <=0){
+  			seconds--;
+			if (seconds<-30) {
+  				document.getElementById("pageInfo").style.backgroundColor = "red"
+			}
+			if (seconds<-60) {
+  				document.body.style.backgroundColor = "red"
+  				document.getElementById("pageInfo").style.backgroundColor = "red"
+			}
+  			document.getElementById("pageInfo").innerHTML = "Refreshing in "+seconds+" seconds."
+  			setTimeout("countdown()", 1000)
+ 		}else{
+  			seconds--;
+  			document.getElementById("pageInfo").innerHTML = "Refreshing in "+seconds+" seconds."
+  			setTimeout("countdown()", 1000)
+ 		}
+	}
+
+	</script>
+   </head>
+
+    <body>
+       <div class="datagrid">
+            <table>
+                <thead>
+                    <tr><th colspan="5"><h1>Alerts/Warnings</h1></th><th><div id="pageInfo"><script>countdown();</script></div>&nbsp;Last refresh: {{lastupdate}}</th></tr>
+                    <tr><th>Hostgroup</th><th>Node</th><th>Check</th><th>Duration</th><th>Status</th><th>Output</th></tr>
+                </thead>
+                <tfoot>
+                    <tr><td colspan="6">
+                        <div id="paging">
+                            <ul>
+                                <li>&nbsp;</li>
+                            </ul>
+                        </div>
+                    </tr>
+                </tfoot>
+
+		{% if length==0 %}
+                <tbody>
+                    <tr><th colspan="6"><center><img height="200" width="200" src="{{ url_for('static', filename='victory.jpg') }}"/></center></th></tr>
+                    <tr><th colspan="6"><h1><center>No Alerts</center></th></tr>
+                </tbody>
+		{% endif %}
+
+		{% if alertlist %}
+		<tbody>
+		{% for i in alertlist %}
+		{% set loopindex=loopindex+1 %}
+		<tr class="box{{loopindex % 2}}">
+			<td>{{i.hostgroup}}</td>
+			<td>{% if i.hosticon %}&nbsp;<img height="16" width="16" src="{{nagiosurl}}/nagiosxi/includes/components/nagioscore/ui/images/logos/{{i.hosticon}}"/>{% endif %} {{i.host_name}} {%if i.host_alias %}({{i.host_alias}}){% endif %} {% if i.host_address %}[{{i.host_address}}]{% endif %}</td>
+			<td>{{i.service_description}} {% if i.notifications_enabled=='0' %}<img height="16" width="16" src="{{ url_for('static', filename='nonotifications.png') }}"/>{% endif %}</td>
+			<td>{{i.duration_text}}</td>
+			<td class="state{{i.current_state}}">{{i.current_text}} ({{i.current_attempt}}/{{i.max_attempts}})</td>
+			<td>{{i.plugin_output}}</td>
+		</tr>
+		{% endfor %}
+                </tbody>
+		{% endif %}
+
+		{% if unknownlist %}
+		<tbody>
+		{% for i in unknownlist %}
+		{% set loopindex=loopindex+1 %}
+		<tr class="box{{loopindex % 2}}">
+			<td>{{i.hostgroup}}</td>
+			<td>{% if i.hosticon %}&nbsp;<img height="16" width="16" src="{{nagiosurl}}/nagiosxi/includes/components/nagioscore/ui/images/logos/{{i.hosticon}}"/>{% endif %} {{i.host_name}} {%if i.host_alias %}({{i.host_alias}}){% endif %} {% if i.host_address %}[{{i.host_address}}]{% endif %}</td>
+			<td>{{i.service_description}} {% if i.notifications_enabled=='0' %}<img height="16" width="16" src="{{ url_for('static', filename='nonotifications.png') }}"/>{% endif %}</td>
+			<td>{{i.duration_text}}</td>
+			<td class="state{{i.current_state}}">{{i.current_text}} ({{i.current_attempt}}/{{i.max_attempts}})</td>
+			<td>{{i.plugin_output}}</td>
+		</tr>
+		{% endfor %}
+                </tbody>
+		{% endif %}
+
+		{% if warninglist %}
+		<tbody>
+		{% for i in warninglist %}
+		{% set loopindex=loopindex+1 %}
+		<tr class="box{{loopindex % 2}}">
+			<td>{{i.hostgroup}}</td>
+			<td>{% if i.hosticon %}&nbsp;<img height="16" width="16" src="{{nagiosurl}}/nagiosxi/includes/components/nagioscore/ui/images/logos/{{i.hosticon}}"/>{% endif %} {{i.host_name}} {%if i.host_alias %}({{i.host_alias}}){% endif %} {% if i.host_address %}[{{i.host_address}}]{% endif %}</td>
+			<td>{{i.service_description}} {% if i.notifications_enabled=='0' %}<img height="16" width="16" src="{{ url_for('static', filename='nonotifications.png') }}"/>{% endif %}</td>
+			<td>{{i.duration_text}}</td>
+			<td class="state{{i.current_state}}">{{i.current_text}} ({{i.current_attempt}}/{{i.max_attempts}})</td>
+			<td>{{i.plugin_output}}</td>
+		</tr>
+		{% endfor %}
+                </tbody>
+		{% endif %}
+
+		{% if infolist %}
+                <thead class="info">
+                    <tr style="background: #FFFFFF; height: 4em;"><td colspan="6">&nbsp;</td></tr>
+                    <tr><th colspan="6"><h1>Info</h1></th></tr>
+                    <tr><th>Hostgroup</th><th>Node</th><th>Check</th><th>Duration</th><th>Status</th><th>Output</th></tr>
+                </thead>
+		<tbody>
+		{% for i in infolist %}
+		{% set loopindex=loopindex+1 %}
+		<tr class="box{{loopindex % 2}}">
+			<td>{{i.hostgroup}}</td>
+			<td>{% if i.hosticon %}&nbsp;<img height="16" width="16" src="{{nagiosurl}}/nagiosxi/includes/components/nagioscore/ui/images/logos/{{i.hosticon}}"/>{% endif %} {{i.host_name}} {%if i.host_alias %}({{i.host_alias}}){% endif %} {% if i.host_address %}[{{i.host_address}}]{% endif %}</td>
+			<td>{{i.service_description}} {% if i.notifications_enabled=='0' %}<img height="16" width="16" src="{{ url_for('static', filename='nonotifications.png') }}"/>{% endif %}</td>
+			<td>{{i.duration_text}}</td>
+			<td class="state{{i.current_state}}">{{i.current_text}} ({{i.current_attempt}}/{{i.max_attempts}})</td>
+			<td>{{i.plugin_output}}</td>
+		</tr>
+		{% endfor %}
+                </tbody>
+		{% endif %}
+
+               <thead class="downtime">
+                    <tr style="background: #FFFFFF; height: 4em;"><td colspan="6">&nbsp;</td></tr>
+                    <tr><th colspan="6"><h1>Downtime Alerts/Warnings/Info/OK</h1></th></tr>
+                    <tr><th>Hostgroup</th><th>Node</th><th>Check</th><th>Duration</th><th>Status</th><th>Output</th></tr>
+               </thead>
+		{% if alertlistdown %}
+		<tbody class="downtime">
+		{% for i in alertlistdown %}
+		{% set loopindex=loopindex+1 %}
+		<tr class="box{{loopindex % 2}}">
+			<td>{{i.hostgroup}}</td>
+			<td>{% if i.hosticon %}&nbsp;<img height="16" width="16" src="{{nagiosurl}}/nagiosxi/includes/components/nagioscore/ui/images/logos/{{i.hosticon}}"/>{% endif %} {{i.host_name}} {%if i.host_alias %}({{i.host_alias}}){% endif %} {% if i.host_address %}[{{i.host_address}}]{% endif %}</td>
+			<td>{{i.service_description}} {% if i.notifications_enabled=='0' %}<img height="16" width="16" src="{{ url_for('static', filename='nonotifications.png') }}"/>{% endif %}{% if i.downcomment %}<img height="16" width="16" alt="{{i.downcomment}} ({{i.downauthor}}) - Down to:{{i.enddown}}" title="{{i.downcomment}} ({{i.downauthor}}) - Down to:{{i.enddown}}" src="{{ url_for('static', filename='downtime.png') }}"/>{% endif %}</td>
+			<td>{{i.duration_text}}</td>
+			<td class="state{{i.current_state}}">{{i.current_text}} ({{i.current_attempt}}/{{i.max_attempts}})</td>
+			<td>{{i.plugin_output}}</td>
+		</tr>
+		{% endfor %}
+                </tbody>
+		{% endif %}
+
+		{% if unknownlistdown %}
+		<tbody class="downtime">
+		{% for i in unknownlistdown %}
+		{% set loopindex=loopindex+1 %}
+		<tr class="box{{loopindex % 2}}">
+			<td>{{i.hostgroup}}</td>
+			<td>{% if i.hosticon %}&nbsp;<img height="16" width="16" src="{{nagiosurl}}/nagiosxi/includes/components/nagioscore/ui/images/logos/{{i.hosticon}}"/>{% endif %} {{i.host_name}} {%if i.host_alias %}({{i.host_alias}}){% endif %} {% if i.host_address %}[{{i.host_address}}]{% endif %}</td>
+			<td>{{i.service_description}} {% if i.notifications_enabled=='0' %}<img height="16" width="16" src="{{ url_for('static', filename='nonotifications.png') }}"/>{% endif %}{% if i.downcomment %}<img height="16" width="16" alt="{{i.downcomment}} ({{i.downauthor}}) - Down to:{{i.enddown}}" title="{{i.downcomment}} ({{i.downauthor}}) - Down to:{{i.enddown}}" src="{{ url_for('static', filename='downtime.png') }}"/>{% endif %}</td>
+			<td>{{i.duration_text}}</td>
+			<td class="state{{i.current_state}}">{{i.current_text}} ({{i.current_attempt}}/{{i.max_attempts}})</td>
+			<td>{{i.plugin_output}}</td>
+		</tr>
+		{% endfor %}
+                </tbody>
+		{% endif %}
+
+		{% if warninglistdown %}
+		<tbody class="downtime">
+		{% for i in warninglistdown %}
+		{% set loopindex=loopindex+1 %}
+		<tr class="box{{loopindex % 2}}">
+			<td>{{i.hostgroup}}</td>
+			<td>{% if i.hosticon %}&nbsp;<img height="16" width="16" src="{{nagiosurl}}/nagiosxi/includes/components/nagioscore/ui/images/logos/{{i.hosticon}}"/>{% endif %} {{i.host_name}} {%if i.host_alias %}({{i.host_alias}}){% endif %} {% if i.host_address %}[{{i.host_address}}]{% endif %}</td>
+			<td>{{i.service_description}} {% if i.notifications_enabled=='0' %}<img height="16" width="16" src="{{ url_for('static', filename='nonotifications.png') }}"/>{% endif %}{% if i.downcomment %}<img height="16" width="16" alt="{{i.downcomment}} ({{i.downauthor}}) - Down to:{{i.enddown}}" title="{{i.downcomment}} ({{i.downauthor}}) - Down to:{{i.enddown}}" src="{{ url_for('static', filename='downtime.png') }}"/>{% endif %}</td>
+			<td>{{i.duration_text}}</td>
+			<td class="state{{i.current_state}}">{{i.current_text}} ({{i.current_attempt}}/{{i.max_attempts}})</td>
+			<td>{{i.plugin_output}}</td>
+		</tr>
+		{% endfor %}
+                </tbody>
+		{% endif %}
+
+		{% if infolistdown %}
+		<tbody class="downtime">
+		{% for i in infolistdown %}
+		{% set loopindex=loopindex+1 %}
+		<tr class="box{{loopindex % 2}}">
+			<td>{{i.hostgroup}}</td>
+			<td>{% if i.hosticon %}&nbsp;<img height="16" width="16" src="{{nagiosurl}}/nagiosxi/includes/components/nagioscore/ui/images/logos/{{i.hosticon}}"/>{% endif %} {{i.host_name}} {%if i.host_alias %}({{i.host_alias}}){% endif %} {% if i.host_address %}[{{i.host_address}}]{% endif %}</td>
+			<td>{{i.service_description}} {% if i.notifications_enabled=='0' %}<img height="16" width="16" src="{{ url_for('static', filename='nonotifications.png') }}"/>{% endif %}{% if i.downcomment %}<img height="16" width="16" alt="{{i.downcomment}} ({{i.downauthor}}) - Down to:{{i.enddown}}" title="{{i.downcomment}} ({{i.downauthor}}) - Down to:{{i.enddown}}" src="{{ url_for('static', filename='downtime.png') }}"/>{% endif %}</td>
+			<td>{{i.duration_text}}</td>
+			<td class="state{{i.current_state}}">{{i.current_text}} ({{i.current_attempt}}/{{i.max_attempts}})</td>
+			<td>{{i.plugin_output}}</td>
+		</tr>
+		{% endfor %}
+                </tbody>
+		{% endif %}
+
+		{% if oklistdown %}
+		<tbody class="downtime">
+		{% for i in oklistdown %}
+		{% set loopindex=loopindex+1 %}
+		<tr class="box{{loopindex % 2}}">
+			<td>{{i.hostgroup}}</td>
+			<td>{% if i.hosticon %}&nbsp;<img height="16" width="16" src="{{nagiosurl}}/nagiosxi/includes/components/nagioscore/ui/images/logos/{{i.hosticon}}"/>{% endif %} {{i.host_name}} {%if i.host_alias %}({{i.host_alias}}){% endif %} {% if i.host_address %}[{{i.host_address}}]{% endif %}</td>
+			<td>{{i.service_description}} {% if i.notifications_enabled=='0' %}<img height="16" width="16" src="{{ url_for('static', filename='nonotifications.png') }}"/>{% endif %}{% if i.downcomment %}<img height="16" width="16" alt="{{i.downcomment}} ({{i.downauthor}}) - Down to:{{i.enddown}}" title="{{i.downcomment}} ({{i.downauthor}}) - Down to:{{i.enddown}}" src="{{ url_for('static', filename='downtime.png') }}"/>{% endif %}</td>
+			<td>{{i.duration_text}}</td>
+			<td class="state{{i.current_state}}">{{i.current_text}} ({{i.current_attempt}}/{{i.max_attempts}})</td>
+			<td>{{i.plugin_output}}</td>
+		</tr>
+		{% endfor %}
+                </tbody>
+		{% endif %}
+
+            </table>
+        </div>
+
+    </body>
+</html>
